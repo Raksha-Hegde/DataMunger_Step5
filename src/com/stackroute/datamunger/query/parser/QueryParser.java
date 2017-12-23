@@ -18,6 +18,7 @@ public class QueryParser {
 			queryParameter.setFile(getFileName(replaceCharacters(queryString)));
 			queryParameter.setBaseQuery(getBaseQuery(replaceCharacters(queryString)));
 			queryParameter.setFields(getFields(replaceCharacters(queryString)));
+			queryParameter.setQUERY_TYPE("Simple query");
 			if (queryString.contains("where")) {
 				queryParameter.setRestrictions(getConditions(replaceCharacters(queryString)));
 				queryParameter.setLogicalOperators(getLogicalOperators(replaceCharacters(queryString)));
@@ -26,16 +27,14 @@ public class QueryParser {
 
 			if (queryString.contains(" order by")) {
 				queryParameter.setOrderByFields(getOrderByFields(replaceCharacters(queryString)));
-				queryParameter.setQUERY_TYPE("order by");
 			}
 			if (queryString.contains(" group by")) {
 				queryParameter.setGroupByFields(getGroupByFields(replaceCharacters(queryString)));
-				queryParameter.setQUERY_TYPE("group by");
 			}
 			if (queryString.contains("(")) {
 				queryParameter.setAggregateFunctions(getAggregateFunctions(replaceCharacters(queryString)));
 			}
-			queryParameter.setQUERY_TYPE("Simple query");
+			
 		}
 
 		return queryParameter;

@@ -22,9 +22,10 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 	private Header header;
 	private RowDataTypeDefinitions rowDataTypeDefinitions;
 	DataTypeDefinitions dataTypeDefinitions;
-	DataSet dataSet;
+	DataSet dataSet = new DataSet();
 	Row row;
 	private long rowID = 1;
+	Filter filter = new Filter();
 
 	/*
 	 * This method will take QueryParameter object as a parameter which contains
@@ -69,10 +70,9 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 			bufferedReader.readLine();
 
 			/*
-			 * read one line at a time from the CSV file till we have any lines
-			 * left
+			 * read one line at a time from the CSV file
 			 */
-			dataSet = new DataSet();
+
 			while ((line = bufferedReader.readLine()) != null) {
 				/*
 				 * once we have read one line, we will split it into a String
@@ -86,26 +86,35 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 				 * fields against those conditions to check whether the selected
 				 * row satifies the conditions
 				 */
+				if (queryParameter.getQUERY_TYPE().equalsIgnoreCase("where")) {
+					System.out.println("Type:    " + queryParameter.getQUERY_TYPE());
+					/*
+					 * from QueryParameter object, read one condition at a time
+					 * and evaluate the same. For evaluating the conditions, we
+					 * will use evaluateExpressions() method of Filter class.
+					 * Please note that evaluation of expression will be done
+					 * differently based on the data type of the field. In case
+					 * the query is having multiple conditions, you need to
+					 * evaluate the overall expression i.e. if we have OR
+					 * operator between two conditions, then the row will be
+					 * selected if any of the condition is satisfied. However,
+					 * in case of AND operator, the row will be selected only if
+					 * both of them are satisfied.
+					 */
 
-				/*
-				 * from QueryParameter object, read one condition at a time and
-				 * evaluate the same. For evaluating the conditions, we will use
-				 * evaluateExpressions() method of Filter class. Please note
-				 * that evaluation of expression will be done differently based
-				 * on the data type of the field. In case the query is having
-				 * multiple conditions, you need to evaluate the overall
-				 * expression i.e. if we have OR operator between two
-				 * conditions, then the row will be selected if any of the
-				 * condition is satisfied. However, in case of AND operator, the
-				 * row will be selected only if both of them are satisfied.
-				 */
+					/*
+					 * check for multiple conditions in where clause for eg:
+					 * where salary>20000 and city=Bangalore for eg: where
+					 * salary>20000 or city=Bangalore and dept!=Sales
+					 */
+					boolean filterFlag = filter.evaluateExpression();
+					if (filterFlag) {
+						// xxx
+					} else {
+						continue;
+					}
 
-				/*
-				 * check for multiple conditions in where clause for eg: where
-				 * salary>20000 and city=Bangalore for eg: where salary>20000 or
-				 * city=Bangalore and dept!=Sales
-				 */
-
+				}
 				/*
 				 * if the overall condition expression evaluates to true, then
 				 * we need to check if all columns are to be selected(select *)
@@ -141,7 +150,7 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 		} catch (IOException e) {
 
 		}
-		System.out.println(dataSet);  
+		// System.out.println(dataSet);
 		/* return dataset object */
 		return dataSet;
 	}
@@ -176,6 +185,5 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 		}
 		return;
 	}
-	
-	
+
 }

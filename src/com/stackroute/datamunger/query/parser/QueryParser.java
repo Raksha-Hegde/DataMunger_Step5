@@ -34,7 +34,7 @@ public class QueryParser {
 			if (queryString.contains("(")) {
 				queryParameter.setAggregateFunctions(getAggregateFunctions(replaceCharacters(queryString)));
 			}
-			
+
 		}
 
 		return queryParameter;
@@ -184,7 +184,7 @@ public class QueryParser {
 	public List<Restriction> getConditions(String queryString) {
 
 		String[] conditions = null;
-		List<Restriction> restrictList = queryParameter.getRestrictions();
+		List<Restriction> restrictList = new ArrayList<Restriction>();
 		if (getConditionsPartQuery(queryString) != null) {
 			String conditionPart = getConditionsPartQuery(queryString).trim();
 			if (conditionPart.toLowerCase().contains(" and ") || conditionPart.toLowerCase().contains(" or ")) {
@@ -197,8 +197,9 @@ public class QueryParser {
 				String[] temp = conditions[i].split("\\s+");
 				Restriction restriction = new Restriction();
 				restriction.setPropertyName(temp[0].trim());
-				restriction.setPropertyValue(temp[2].trim());
 				restriction.setCondition(temp[1].trim());
+				System.out.println(temp[1]);
+				restriction.setPropertyValue(temp[2].trim());
 				restrictList.add(restriction);
 			}
 		}

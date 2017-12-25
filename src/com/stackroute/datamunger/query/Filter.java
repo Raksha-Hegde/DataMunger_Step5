@@ -1,8 +1,14 @@
 package com.stackroute.datamunger.query;
 
+import java.util.Iterator;
+import java.util.List;
+import com.stackroute.datamunger.query.parser.Restriction;
+
 //this class contains methods to evaluate expressions
 public class Filter {
 
+	private boolean flag = false;
+	private static Restriction restriction;
 	/*
 	 * the evaluateExpression() method of this class is responsible for
 	 * evaluating the expressions mentioned in the query. It has to be noted
@@ -14,8 +20,16 @@ public class Filter {
 	 * 
 	 */
 
-	public boolean evaluateExpression() {
-		return false;
+	public boolean evaluateExpression(List<Restriction> list) {
+		Iterator<Restriction> itr = list.iterator();
+		restriction = new Restriction();
+		while (itr.hasNext()) {
+			restriction = itr.next();
+			System.out.print(restriction.getPropertyName());
+			System.out.println(restriction.getCondition());
+			System.out.print(restriction.getPropertyValue());
+		}
+		return flag;
 	}
 
 	// method containing implementation of equalTo operator

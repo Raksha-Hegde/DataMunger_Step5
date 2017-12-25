@@ -73,7 +73,11 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 			 * read one line at a time from the CSV file
 			 */
 
-			while ((line = bufferedReader.readLine()) != null) {
+			// while ((line = bufferedReader.readLine()) != null) {
+			int x = 1;
+			while (x != 0) {
+				x--;
+				line = bufferedReader.readLine();
 				/*
 				 * once we have read one line, we will split it into a String
 				 * Array. This array will continue all the fields of the row.
@@ -87,7 +91,6 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 				 * row satifies the conditions
 				 */
 				if (queryParameter.getQUERY_TYPE().equalsIgnoreCase("where")) {
-					System.out.println("Type:    " + queryParameter.getQUERY_TYPE());
 					/*
 					 * from QueryParameter object, read one condition at a time
 					 * and evaluate the same. For evaluating the conditions, we
@@ -107,10 +110,9 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 					 * where salary>20000 and city=Bangalore for eg: where
 					 * salary>20000 or city=Bangalore and dept!=Sales
 					 */
-					boolean filterFlag = filter.evaluateExpression();
-					if (filterFlag) {
-						// xxx
-					} else {
+
+					boolean filterFlag = filter.evaluateExpression(queryParameter.getRestrictions());
+					if (!filterFlag) {
 						continue;
 					}
 

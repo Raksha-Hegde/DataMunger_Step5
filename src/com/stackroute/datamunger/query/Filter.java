@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import com.stackroute.datamunger.query.parser.Restriction;
 
@@ -70,7 +71,6 @@ public class Filter {
 		} else if (columnDataType.equals("java.lang.Float")) {
 			conditionFlag = (Float.parseFloat(propertyValue) == Float.parseFloat(columnValue));
 		} else if (columnDataType.equals("java.util.Date")) {
-			
 
 		}
 		return conditionFlag;
@@ -150,6 +150,31 @@ public class Filter {
 		}
 		return conditionFlag;
 
+	}
+
+	public Boolean evaluateConditions(List<Boolean> flagStatus, List<String> logicalOperators) {
+		Boolean status = false;
+//		String cScript = "";
+//		int i = 0;
+//		String op = null;
+//		for (boolean stat : condStatusList) {
+//			cScript += stat;
+//			if (i < logicalOperators.size()) {
+//				if (logicalOperators.get(i).equalsIgnoreCase("and")) {
+//					op = "&&";
+//				} else if (logicalOperators.get(i).equalsIgnoreCase("or")) {
+//					op = "||";
+//				}
+//				cScript += op;
+//				i++;
+//			}
+//		}
+//		try {
+//			status = (boolean) javaScript.eval(cScript);
+//		} catch (ScriptException e) {
+//			e.printStackTrace();
+//		}
+		return status;
 	}
 
 }

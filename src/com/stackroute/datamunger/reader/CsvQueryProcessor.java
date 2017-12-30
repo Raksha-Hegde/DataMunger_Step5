@@ -28,6 +28,7 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 	Filter filter = new Filter();
 	List<Boolean> flag = new ArrayList<Boolean>();
 	String condition, propertyName, propertyValue;
+	List<String> logicalOperators;
 
 	/*
 	 * This method will take QueryParameter object as a parameter which contains
@@ -75,8 +76,8 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 			 * read one line at a time from the CSV file
 			 */
 
-			// while ((line = bufferedReader.readLine()) != null) {
-			int x = 1;
+//			 while ((line = bufferedReader.readLine()) != null) {
+			int x = 2;
 			while (x != 0) {
 				x--;
 				line = bufferedReader.readLine();
@@ -127,7 +128,15 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 					 * where salary>20000 and city=Bangalore for eg: where
 					 * salary>20000 or city=Bangalore and dept!=Sales
 					 */
-
+					logicalOperators = queryParameter.getLogicalOperators();
+					Iterator<String> it = logicalOperators.iterator();
+					while(it.hasNext()){
+						System.out.println("xxxxxxxxxxxxxxxxxxxxxxxx"+it.next());
+					}
+					if(!filter.evaluateConditions(flag,logicalOperators))
+					{
+						continue;
+					}
 					/*
 					 * if the overall condition expression evaluates to true,
 					 * then we need to check if all columns are to be
@@ -164,11 +173,12 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 		} catch (IOException e) {
 
 		}
-		// System.out.println(dataSet);
+//		 System.out.println(dataSet);
 		/* return dataset object */
 		return dataSet;
 	}
 
+	
 	/*
 	 * implementation of getHeader() method. We will have to extract the headers
 	 * from the first line of the file.

@@ -45,9 +45,9 @@ public class QueryParser {
 
 	public String replaceCharacters(String queryString) {
 		queryString = queryString.replace(";", "");
-		queryString = queryString.replace("=", " = ");
-		queryString = queryString.replace(">", " > ");
-		queryString = queryString.replace("<", " < ");
+		queryString = queryString.replace("='", " = '");
+		 queryString = queryString.replace(">'", " > '");
+		 queryString = queryString.replace("<'", " < '");
 		queryString = queryString.replace(">=", " >= ");
 		queryString = queryString.replace("<=", " <= ");
 		queryString = queryString.replace("!=", " != ");

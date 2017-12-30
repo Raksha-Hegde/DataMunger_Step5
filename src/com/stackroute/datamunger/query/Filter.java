@@ -2,16 +2,18 @@ package com.stackroute.datamunger.query;
 
 import java.util.Iterator;
 import java.util.List;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
 import com.stackroute.datamunger.query.parser.Restriction;
 
 //this class contains methods to evaluate expressions
 public class Filter {
 
-	private boolean flag = false;
-	private static Restriction restriction;
-	private String condition, propertyName, propertyValue;
-	Header header;
-	RowDataTypeDefinitions rowDataTypeDefinitions = new RowDataTypeDefinitions();
+	private Boolean flag = false;
+	private Boolean conditionFlag;
+
 	/*
 	 * the evaluateExpression() method of this class is responsible for
 	 * evaluating the expressions mentioned in the query. It has to be noted
@@ -22,38 +24,132 @@ public class Filter {
 	 * lowercase
 	 * 
 	 */
+	ScriptEngineManager sem = new ScriptEngineManager();
+	ScriptEngine javaScript = sem.getEngineByName("JavaScript");
 
-	public boolean evaluateExpression(List<Restriction> list) {
-		Iterator<Restriction> itr = list.iterator();
-		restriction = new Restriction();
-		while (itr.hasNext()) {
-			restriction = itr.next();
-			System.out.println("Name: " + restriction.getPropertyName());
-			propertyName = restriction.getPropertyName();
-			System.out.println("Cond: " + restriction.getCondition());
-			condition = restriction.getCondition();
-			System.out.println("Value: " + restriction.getPropertyValue());
-			propertyValue = restriction.getPropertyValue();
-			
-			
+	public Boolean evaluateExpression(String condition, String propertyValue, String columnValue,
+			String columnDataType) {
+		switch (condition) {
+		case "=": {
+			flag = equalTo(propertyValue, columnValue, columnDataType);
+			break;
+		}
+		case "!=": {
+			flag = notEqualTo(propertyValue, columnValue, columnDataType);
+			break;
+		}
+		case "<=": {
+			flag = lessThanOrEqualTo(propertyValue, columnValue, columnDataType);
+			break;
+		}
+		case "<": {
+			flag = lessThan(propertyValue, columnValue, columnDataType);
+			break;
+		}
+		case ">=": {
+			flag = greaterThanOrEqualTo(propertyValue, columnValue, columnDataType);
+			break;
+		}
+		case ">": {
+			flag = greaterThan(propertyValue, columnValue, columnDataType);
+			break;
+		}
+
 		}
 		return flag;
 	}
 
 	// method containing implementation of equalTo operator
-	private boolean equalTo() {
+	private Boolean equalTo(String propertyValue, String columnValue, String columnDataType) {
+		if (columnDataType.equals("java.lang.String")) {
+			{
+				conditionFlag = propertyValue.equals(columnValue);
+			}
+		} else if (columnDataType.equals("java.lang.Integer")) {
+			conditionFlag = (Integer.parseInt(propertyValue) == Integer.parseInt(columnValue));
+		} else if (columnDataType.equals("java.lang.Float")) {
+			conditionFlag = (Float.parseFloat(propertyValue) == Float.parseFloat(columnValue));
+		} else if (columnDataType.equals("java.util.Date")) {
+			
 
-		return false;
+		}
+		return conditionFlag;
+
 	}
 
 	// method containing implementation of notEqualTo operator
+	private Boolean notEqualTo(String propertyValue, String columnValue, String columnDataType) {
+		if (columnDataType.equals("java.lang.String")) {
+			conditionFlag = !propertyValue.equals(columnValue);
+		} else if (columnDataType.equals("java.lang.Integer")) {
+			conditionFlag = (Integer.parseInt(propertyValue) != Integer.parseInt(columnValue));
+		} else if (columnDataType.equals("java.lang.Float")) {
+			conditionFlag = (Float.parseFloat(propertyValue) != Float.parseFloat(columnValue));
+		} else if (columnDataType.equals("java.util.Date")) {
+
+		}
+		return conditionFlag;
+
+	}
 
 	// method containing implementation of greaterThan operator
+	private Boolean greaterThan(String propertyValue, String columnValue, String columnDataType) {
+		if (columnDataType.equals("java.lang.String")) {
+			conditionFlag = propertyValue.equals(columnValue);
+		} else if (columnDataType.equals("java.lang.Integer")) {
+			conditionFlag = (Integer.parseInt(propertyValue) > Integer.parseInt(columnValue));
+		} else if (columnDataType.equals("java.lang.Float")) {
+			conditionFlag = (Float.parseFloat(propertyValue) > Float.parseFloat(columnValue));
+		} else if (columnDataType.equals("java.util.Date")) {
+
+		}
+		return conditionFlag;
+
+	}
 
 	// method containing implementation of greaterThanOrEqualTo operator
+	private Boolean greaterThanOrEqualTo(String propertyValue, String columnValue, String columnDataType) {
+		if (columnDataType.equals("java.lang.String")) {
+			conditionFlag = propertyValue.equals(columnValue);
+		} else if (columnDataType.equals("java.lang.Integer")) {
+			conditionFlag = (Integer.parseInt(propertyValue) >= Integer.parseInt(columnValue));
+		} else if (columnDataType.equals("java.lang.Float")) {
+			conditionFlag = (Float.parseFloat(propertyValue) >= Float.parseFloat(columnValue));
+		} else if (columnDataType.equals("java.util.Date")) {
+
+		}
+		return conditionFlag;
+
+	}
 
 	// method containing implementation of lessThan operator
+	private Boolean lessThan(String propertyValue, String columnValue, String columnDataType) {
+		if (columnDataType.equals("java.lang.String")) {
+			conditionFlag = propertyValue.equals(columnValue);
+		} else if (columnDataType.equals("java.lang.Integer")) {
+			conditionFlag = (Integer.parseInt(propertyValue) < Integer.parseInt(columnValue));
+		} else if (columnDataType.equals("java.lang.Float")) {
+			conditionFlag = (Float.parseFloat(propertyValue) < Float.parseFloat(columnValue));
+		} else if (columnDataType.equals("java.util.Date")) {
+
+		}
+		return conditionFlag;
+
+	}
 
 	// method containing implementation of lessThanOrEqualTo operator
+	private Boolean lessThanOrEqualTo(String propertyValue, String columnValue, String columnDataType) {
+		if (columnDataType.equals("java.lang.String")) {
+			conditionFlag = propertyValue.equals(columnValue);
+		} else if (columnDataType.equals("java.lang.Integer")) {
+			conditionFlag = (Integer.parseInt(propertyValue) <= Integer.parseInt(columnValue));
+		} else if (columnDataType.equals("java.lang.Float")) {
+			conditionFlag = (Float.parseFloat(propertyValue) <= Float.parseFloat(columnValue));
+		} else if (columnDataType.equals("java.util.Date")) {
+
+		}
+		return conditionFlag;
+
+	}
 
 }

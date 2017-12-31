@@ -12,7 +12,7 @@ import com.stackroute.datamunger.query.parser.Restriction;
 //this class contains methods to evaluate expressions
 public class Filter {
 
-	private Boolean flag = false;
+	private Boolean flag;
 	private Boolean conditionFlag;
 
 	/*
@@ -60,6 +60,32 @@ public class Filter {
 		return flag;
 	}
 
+	// method containing implementation of greaterThanOrEqualTo operator
+	private Boolean greaterThanOrEqualTo(String propertyValue, String columnValue, String columnDataType) {
+		switch (columnDataType) {
+		case "java.lang.String": {
+			conditionFlag = propertyValue.equals(columnValue);
+			break;
+		}
+		case "java.lang.Integer": {
+			int property = Integer.parseInt(propertyValue);
+			int column = Integer.parseInt(columnValue);
+			conditionFlag = (column >= property);
+			break;
+		}
+		case "java.lang.Float": {
+			float property = Float.parseFloat(propertyValue);
+			float column = Float.parseFloat(columnValue);
+			conditionFlag = (column >= property);
+			break;
+		}
+		case "java.util.Date": {
+			break;
+		}
+		}
+		return conditionFlag;
+	}
+
 	// method containing implementation of equalTo operator
 	private Boolean equalTo(String propertyValue, String columnValue, String columnDataType) {
 		if (columnDataType.equals("java.lang.String")) {
@@ -97,24 +123,9 @@ public class Filter {
 		if (columnDataType.equals("java.lang.String")) {
 			conditionFlag = propertyValue.equals(columnValue);
 		} else if (columnDataType.equals("java.lang.Integer")) {
-			conditionFlag = (Integer.parseInt(propertyValue) > Integer.parseInt(columnValue));
+			conditionFlag = (Integer.parseInt(columnValue) > Integer.parseInt(propertyValue));
 		} else if (columnDataType.equals("java.lang.Float")) {
-			conditionFlag = (Float.parseFloat(propertyValue) > Float.parseFloat(columnValue));
-		} else if (columnDataType.equals("java.util.Date")) {
-
-		}
-		return conditionFlag;
-
-	}
-
-	// method containing implementation of greaterThanOrEqualTo operator
-	private Boolean greaterThanOrEqualTo(String propertyValue, String columnValue, String columnDataType) {
-		if (columnDataType.equals("java.lang.String")) {
-			conditionFlag = propertyValue.equals(columnValue);
-		} else if (columnDataType.equals("java.lang.Integer")) {
-			conditionFlag = (Integer.parseInt(propertyValue) >= Integer.parseInt(columnValue));
-		} else if (columnDataType.equals("java.lang.Float")) {
-			conditionFlag = (Float.parseFloat(propertyValue) >= Float.parseFloat(columnValue));
+			conditionFlag = (Float.parseFloat(columnValue) > Float.parseFloat(propertyValue));
 		} else if (columnDataType.equals("java.util.Date")) {
 
 		}
@@ -127,9 +138,9 @@ public class Filter {
 		if (columnDataType.equals("java.lang.String")) {
 			conditionFlag = propertyValue.equals(columnValue);
 		} else if (columnDataType.equals("java.lang.Integer")) {
-			conditionFlag = (Integer.parseInt(propertyValue) < Integer.parseInt(columnValue));
+			conditionFlag = (Integer.parseInt(columnValue) < Integer.parseInt(propertyValue));
 		} else if (columnDataType.equals("java.lang.Float")) {
-			conditionFlag = (Float.parseFloat(propertyValue) < Float.parseFloat(columnValue));
+			conditionFlag = (Float.parseFloat(columnValue) < Float.parseFloat(propertyValue));
 		} else if (columnDataType.equals("java.util.Date")) {
 
 		}
@@ -142,38 +153,47 @@ public class Filter {
 		if (columnDataType.equals("java.lang.String")) {
 			conditionFlag = propertyValue.equals(columnValue);
 		} else if (columnDataType.equals("java.lang.Integer")) {
-			conditionFlag = (Integer.parseInt(propertyValue) <= Integer.parseInt(columnValue));
+			conditionFlag = (Integer.parseInt(columnValue) <= Integer.parseInt(propertyValue));
 		} else if (columnDataType.equals("java.lang.Float")) {
-			conditionFlag = (Float.parseFloat(propertyValue) <= Float.parseFloat(columnValue));
+			conditionFlag = (Float.parseFloat(columnValue) <= Float.parseFloat(propertyValue));
 		} else if (columnDataType.equals("java.util.Date")) {
 
 		}
+
 		return conditionFlag;
 
 	}
 
 	public Boolean evaluateConditions(List<Boolean> flagStatus, List<String> logicalOperators) {
-		Boolean status = false;
-//		String cScript = "";
-//		int i = 0;
-//		String op = null;
-//		for (boolean stat : condStatusList) {
-//			cScript += stat;
-//			if (i < logicalOperators.size()) {
-//				if (logicalOperators.get(i).equalsIgnoreCase("and")) {
-//					op = "&&";
-//				} else if (logicalOperators.get(i).equalsIgnoreCase("or")) {
-//					op = "||";
-//				}
-//				cScript += op;
-//				i++;
-//			}
-//		}
-//		try {
-//			status = (boolean) javaScript.eval(cScript);
-//		} catch (ScriptException e) {
-//			e.printStackTrace();
-//		}
+		Boolean status = flagStatus.get(0);
+		String operator;
+		// String cScript = "";
+		// int i = 0;
+		// String op = null;
+		// for (boolean stat : condStatusList) {
+		// cScript += stat;
+		// if (i < logicalOperators.size()) {
+		// if (logicalOperators.get(i).equalsIgnoreCase("and")) {
+		// op = "&&";
+		// } else if (logicalOperators.get(i).equalsIgnoreCase("or")) {
+		// op = "||";
+		// }
+		// cScript += op;
+		// i++;
+		// }
+		// }
+		// try {
+		// status = (boolean) javaScript.eval(cScript);
+		// } catch (ScriptException e) {
+		// e.printStackTrace();
+		// }
+		for (int i = 0; i < logicalOperators.size(); i++) {
+			if (logicalOperators.get(i).equalsIgnoreCase("and")) {
+				status = (status && flagStatus.get(i + 1));
+			} else if (logicalOperators.get(i).equalsIgnoreCase("and")) {
+				status = (status || flagStatus.get(i + 1));
+			}
+		}
 		return status;
 	}
 

@@ -29,6 +29,7 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 	List<Boolean> flag = new ArrayList<Boolean>();
 	String condition, propertyName, propertyValue;
 	List<String> logicalOperators;
+	Boolean logicFlag = true;
 
 	/*
 	 * This method will take QueryParameter object as a parameter which contains
@@ -36,17 +37,12 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 	 */
 	public DataSet getResultSet(QueryParameter queryParameter) {
 
-		/*
-		 * initialize BufferedReader to read from the file which is mentioned in
-		 * QueryParameter. Consider Handling Exception related to file reading.
-		 */
 		try {
 			bufferedReader = new BufferedReader(new FileReader(queryParameter.getFile()));
 			/*
 			 * read the first line which contains the header and populate the
 			 * header Map object
 			 */
-
 			String[] headerValue = getHeader(bufferedReader.readLine());
 
 			/*
@@ -56,18 +52,7 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 			getColumnType(bufferedReader.readLine());
 
 			/*
-			 * once we have the header and dataTypeDefinitions maps populated,
-			 * we can start reading from the first line. We will read one line
-			 * at a time, then check whether the field values satisfy the
-			 * conditions mentioned in the query,if yes, then we will add it to
-			 * the resultSet. Otherwise, we will continue to read the next line.
-			 * We will continue this till we have read till the last line of the
-			 * CSV file.
-			 */
-
-			/*
-			 * reset the buffered reader so that it can start reading from the
-			 * first line
+			 * reset the buffered reader and read first line
 			 */
 			bufferedReader = new BufferedReader(new FileReader(queryParameter.getFile()));
 			bufferedReader.readLine();
@@ -76,94 +61,64 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 			 * read one line at a time from the CSV file
 			 */
 
-//			 while ((line = bufferedReader.readLine()) != null) {
-			int x = 2;
-			while (x != 0) {
-				x--;
-				line = bufferedReader.readLine();
+			while ((line = bufferedReader.readLine()) != null) {
+
 				/*
-				 * once we have read one line, we will split it into a String
-				 * Array. This array will continue all the fields of the row.
-				 * Please note that fields might contain spaces in between.
-				 * Also, few fields might be empty.
+				 * once we have read one line, we will split it into a String[]
 				 */
 				String[] columnValue = line.split(",", -1);
 				/*
 				 * if there are where condition(s) in the query, test the row
 				 * fields against those conditions to check whether the selected
-				 * row satifies the conditions
+				 * row satisfies the conditions
 				 */
 				if (queryParameter.getQUERY_TYPE().equalsIgnoreCase("where")) {
-					/*
-					 * from QueryParameter object, read one condition at a time
-					 * and evaluate the same. For evaluating the conditions, we
-					 * will use evaluateExpressions() method of Filter class.
-					 * Please note that evaluation of expression will be done
-					 * differently based on the data type of the field. In case
-					 * the query is having multiple conditions, you need to
-					 * evaluate the overall expression i.e. if we have OR
-					 * operator between two conditions, then the row will be
-					 * selected if any of the condition is satisfied. However,
-					 * in case of AND operator, the row will be selected only if
-					 * both of them are satisfied.
-					 */
+
 					List<Restriction> restrictions = queryParameter.getRestrictions();
 					Iterator<Restriction> itr = restrictions.iterator();
 					Restriction restriction = new Restriction();
+					/*
+					 * from QueryParameter object, read one condition at a time
+					 * and evaluate the same.
+					 */
 					while (itr.hasNext()) {
 						restriction = itr.next();
-						System.out.println("Name: " + restriction.getPropertyName());
 						propertyName = restriction.getPropertyName();
-						System.out.println("Cond: " + restriction.getCondition());
 						condition = restriction.getCondition();
-						System.out.println("Value: " + restriction.getPropertyValue());
 						propertyValue = restriction.getPropertyValue();
 
-						flag.add(filter.evaluateExpression(condition, propertyValue,
+						System.out.println("Conditions: " + flag.add(filter.evaluateExpression(condition, propertyValue,
 								columnValue[header.get(propertyName)],
-								rowDataTypeDefinitions.get(header.get(propertyName))));
+								rowDataTypeDefinitions.get(header.get(propertyName)))));
 					}
 					/*
-					 * check for multiple conditions in where clause for eg:
-					 * where salary>20000 and city=Bangalore for eg: where
-					 * salary>20000 or city=Bangalore and dept!=Sales
+					 * check for multiple conditions
 					 */
 					logicalOperators = queryParameter.getLogicalOperators();
-					Iterator<String> it = logicalOperators.iterator();
-					while(it.hasNext()){
-						System.out.println("xxxxxxxxxxxxxxxxxxxxxxxx"+it.next());
-					}
-					if(!filter.evaluateConditions(flag,logicalOperators))
-					{
-						continue;
-					}
-					/*
-					 * if the overall condition expression evaluates to true,
-					 * then we need to check if all columns are to be
-					 * selected(select *) or few columns are to be
-					 * selected(select col1,col2). In either of the cases, we
-					 * will have to populate the row map object. Row Map object
-					 * is having type <String,String> to contain field Index and
-					 * field value for the selected fields. Once the row object
-					 * is populated, add it to DataSet Map Object. DataSet Map
-					 * object is having type <Long,Row> to hold the rowId (to be
-					 * manually generated by incrementing a Long variable) and
-					 * it's corresponding Row Object.
-					 */}
-				row = new Row();
-				if (queryParameter.getFields().isEmpty() | queryParameter.getFields().contains("*")) {
-					for (int i = 0; i < headerValue.length; i++) {
-						row.put(headerValue[i], columnValue[i]);
-					}
-					dataSet.put(rowID++, row);
 
-				} else {
-					Iterator<String> itrString = queryParameter.getFields().iterator();
-					while (itrString.hasNext()) {
-						String field = itrString.next();
-						row.put(field, columnValue[header.get(field)]);
+					if (logicalOperators != null) {
+						logicFlag = filter.evaluateConditions(flag, logicalOperators);
 					}
-					dataSet.put(rowID++, row);
+
+				}
+				if (logicFlag) {
+
+					row = new Row();
+					if (queryParameter.getFields().isEmpty() | queryParameter.getFields().contains("*")) {
+						for (int i = 0; i < headerValue.length; i++) {
+							row.put(headerValue[i], columnValue[i]);
+						}
+						dataSet.put(rowID++, row);
+
+					} else {
+						Iterator<String> itrString = queryParameter.getFields().iterator();
+						while (itrString.hasNext()) {
+							String field = itrString.next();
+							row.put(field, columnValue[header.get(field)]);
+						}
+						dataSet.put(rowID++, row);
+					}
+
 				}
 
 			}
@@ -173,12 +128,12 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 		} catch (IOException e) {
 
 		}
-//		 System.out.println(dataSet);
+		System.out.println(dataSet);
+
 		/* return dataset object */
 		return dataSet;
 	}
 
-	
 	/*
 	 * implementation of getHeader() method. We will have to extract the headers
 	 * from the first line of the file.

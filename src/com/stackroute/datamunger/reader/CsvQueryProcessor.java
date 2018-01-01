@@ -26,7 +26,7 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 	Row row;
 	private long rowID = 1;
 	Filter filter = new Filter();
-	List<Boolean> flag = new ArrayList<Boolean>();
+	List<Boolean> flag;
 	String condition, propertyName, propertyValue;
 	List<String> logicalOperators;
 	Boolean logicFlag = true;
@@ -50,7 +50,6 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 			 * populate the RowDataTypeDefinition Map object.
 			 */
 			getColumnType(bufferedReader.readLine());
-
 			/*
 			 * reset the buffered reader and read first line
 			 */
@@ -62,18 +61,28 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 			 */
 
 			while ((line = bufferedReader.readLine()) != null) {
-
+				// int q = 10;
+				// while (q > 0) {
+				// q--;
+				// line = bufferedReader.readLine();
 				/*
 				 * once we have read one line, we will split it into a String[]
 				 */
 				String[] columnValue = line.split(",", -1);
+				try {
+					Thread.sleep(150);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println(columnValue[0]);
 				/*
 				 * if there are where condition(s) in the query, test the row
 				 * fields against those conditions to check whether the selected
 				 * row satisfies the conditions
 				 */
 				if (queryParameter.getQUERY_TYPE().equalsIgnoreCase("where")) {
-
+					System.out.println("Where");
 					List<Restriction> restrictions = queryParameter.getRestrictions();
 					Iterator<Restriction> itr = restrictions.iterator();
 					Restriction restriction = new Restriction();
@@ -81,44 +90,52 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 					 * from QueryParameter object, read one condition at a time
 					 * and evaluate the same.
 					 */
+					flag = new ArrayList<Boolean>();
+					boolean flags = false;
 					while (itr.hasNext()) {
 						restriction = itr.next();
 						propertyName = restriction.getPropertyName();
 						condition = restriction.getCondition();
 						propertyValue = restriction.getPropertyValue();
-
-						System.out.println("Conditions: " + flag.add(filter.evaluateExpression(condition, propertyValue,
-								columnValue[header.get(propertyName)],
-								rowDataTypeDefinitions.get(header.get(propertyName)))));
+						System.out.println(propertyName + "\t" + condition + "\t" + propertyValue);
+						flags = filter.evaluateExpression(condition, propertyValue,
+								columnValue[header.get(propertyName) - 1],
+								rowDataTypeDefinitions.get(header.get(propertyName)));
+						flag.add(flags);
+						System.out.println("Returned flag\t" + flag);
 					}
+
 					/*
 					 * check for multiple conditions
 					 */
 					logicalOperators = queryParameter.getLogicalOperators();
-
 					if (logicalOperators != null) {
 						logicFlag = filter.evaluateConditions(flag, logicalOperators);
+					} else {
+						logicFlag = flags;
 					}
 
 				}
-				if (logicFlag) {
 
+				if (logicFlag) {
+					System.out.println("Logic Flag\t" + logicFlag);
 					row = new Row();
 					if (queryParameter.getFields().isEmpty() | queryParameter.getFields().contains("*")) {
 						for (int i = 0; i < headerValue.length; i++) {
 							row.put(headerValue[i], columnValue[i]);
 						}
-						dataSet.put(rowID++, row);
 
 					} else {
 						Iterator<String> itrString = queryParameter.getFields().iterator();
+
 						while (itrString.hasNext()) {
 							String field = itrString.next();
-							row.put(field, columnValue[header.get(field)]);
+							row.put(field, columnValue[header.get(field) - 1]);
 						}
-						dataSet.put(rowID++, row);
-					}
 
+					}
+					System.out.println(row.entrySet());
+					dataSet.put(rowID++, row);
 				}
 
 			}
@@ -140,7 +157,7 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 	 */
 	private String[] getHeader(String line) throws IOException {
 
-		int counter = 0;
+		int counter = 1;
 		header = new Header();
 		String[] headerValue = line.split(",");
 		for (String head : headerValue) {
@@ -161,6 +178,7 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 		dataTypeDefinitions = new DataTypeDefinitions();
 		for (String column : columnData) {
 			rowDataTypeDefinitions.put(counter++, dataTypeDefinitions.getDataType(column));
+
 		}
 		return;
 	}

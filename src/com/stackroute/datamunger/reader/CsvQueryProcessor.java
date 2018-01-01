@@ -61,28 +61,18 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 			 */
 
 			while ((line = bufferedReader.readLine()) != null) {
-				// int q = 10;
-				// while (q > 0) {
-				// q--;
-				// line = bufferedReader.readLine();
 				/*
 				 * once we have read one line, we will split it into a String[]
 				 */
 				String[] columnValue = line.split(",", -1);
-				try {
-					Thread.sleep(150);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				System.out.println(columnValue[0]);
+
 				/*
 				 * if there are where condition(s) in the query, test the row
 				 * fields against those conditions to check whether the selected
 				 * row satisfies the conditions
 				 */
 				if (queryParameter.getQUERY_TYPE().equalsIgnoreCase("where")) {
-					System.out.println("Where");
+
 					List<Restriction> restrictions = queryParameter.getRestrictions();
 					Iterator<Restriction> itr = restrictions.iterator();
 					Restriction restriction = new Restriction();
@@ -97,12 +87,12 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 						propertyName = restriction.getPropertyName();
 						condition = restriction.getCondition();
 						propertyValue = restriction.getPropertyValue();
-						System.out.println(propertyName + "\t" + condition + "\t" + propertyValue);
+
 						flags = filter.evaluateExpression(condition, propertyValue,
 								columnValue[header.get(propertyName) - 1],
 								rowDataTypeDefinitions.get(header.get(propertyName)));
 						flag.add(flags);
-						System.out.println("Returned flag\t" + flag);
+
 					}
 
 					/*
@@ -116,9 +106,9 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 					}
 
 				}
-
+				// Select Clause
 				if (logicFlag) {
-					System.out.println("Logic Flag\t" + logicFlag);
+
 					row = new Row();
 					if (queryParameter.getFields().isEmpty() | queryParameter.getFields().contains("*")) {
 						for (int i = 0; i < headerValue.length; i++) {
@@ -134,7 +124,7 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 						}
 
 					}
-					System.out.println(row.entrySet());
+
 					dataSet.put(rowID++, row);
 				}
 
@@ -145,7 +135,6 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 		} catch (IOException e) {
 
 		}
-		System.out.println(dataSet);
 
 		/* return dataset object */
 		return dataSet;

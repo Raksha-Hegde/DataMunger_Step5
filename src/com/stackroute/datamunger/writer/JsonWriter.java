@@ -4,12 +4,11 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class JsonWriter {
-	private boolean flag = false;
+	private boolean flag;
 	private BufferedWriter bufferedWriter;
 
 	/*
@@ -18,10 +17,6 @@ public class JsonWriter {
 	 */
 	public boolean writeToJson(Map resultSet) {
 
-		/*
-		 * Gson is a third party library to convert Java object to JSON. We will
-		 * use Gson to convert resultSet object to JSON
-		 */
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String result = gson.toJson(resultSet);
 
@@ -29,10 +24,12 @@ public class JsonWriter {
 		 * write JSON string to data/result.json file. As we are performing File
 		 * IO, consider handling exception
 		 */
-		String outputFileName = System.getProperty("user.dir") + "data/result.json";
+
 		try {
-			bufferedWriter = new BufferedWriter(new FileWriter(outputFileName));
+			bufferedWriter = new BufferedWriter(new FileWriter("data/result.json"));
 			bufferedWriter.write(result);
+			System.out.println("Result Set");
+			System.out.println(result);
 			/*
 			 * return true if file writing is successful
 			 */
@@ -46,8 +43,6 @@ public class JsonWriter {
 		} catch (IOException e) {
 			/* return false if file writing is failed */
 			flag = false;
-		} finally {
-
 		}
 		return flag;
 	}

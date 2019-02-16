@@ -102,7 +102,7 @@ public class CsvQueryProcessor implements QueryProcessingEngine {
 					if (logicalOperators != null) {
 						logicFlag = filter.evaluateConditions(flag, logicalOperators);
 					} else {
-						logicFlag = flags;
+						logicFlag = flag.get(0);
 					}
 
 				}

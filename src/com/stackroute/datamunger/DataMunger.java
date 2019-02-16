@@ -8,7 +8,6 @@ public class DataMunger {
 	private static final Scanner SCANNER_OBJ = new Scanner(System.in);
 
 	public static void main(String[] args) {
-
 		// read the query from the user
 		String queryString = SCANNER_OBJ.nextLine();
 

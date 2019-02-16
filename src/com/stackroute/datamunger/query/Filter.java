@@ -15,7 +15,6 @@ public class Filter {
 
 	public Boolean evaluateExpression(String condition, String propertyValue, String columnValue,
 			String columnDataType) {
-		System.out.println("Prop\t:" + columnValue);
 		switch (condition) {
 		case "=": {
 			flag = equalTo(propertyValue, columnValue, columnDataType);
@@ -43,7 +42,6 @@ public class Filter {
 		}
 
 		}
-		System.out.println("Condition \t" + conditionFlag);
 		return flag;
 	}
 
